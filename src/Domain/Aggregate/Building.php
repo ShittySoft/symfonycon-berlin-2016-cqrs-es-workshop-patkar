@@ -6,6 +6,7 @@ namespace Building\Domain\Aggregate;
 
 use Building\Domain\DomainEvent\NewBuildingWasRegistered;
 use Building\Domain\DomainEvent\UserCheckedIntoBuilding;
+use Building\Domain\Exception\UserAlreadyCheckedIn;
 use Prooph\EventSourcing\AggregateRoot;
 use Rhumsaa\Uuid\Uuid;
 
@@ -42,6 +43,10 @@ final class Building extends AggregateRoot
 
     public function checkInUser(string $username)
     {
+        if (in_array($username, $this->checkedInUsers, true)) {
+            throw new UserAlreadyCheckedIn($this->uuid, $this->name, $username);
+        }
+
         $this->recordThat(UserCheckedIntoBuilding::fromBuildingAndUsername(
             $this->uuid,
             $username
