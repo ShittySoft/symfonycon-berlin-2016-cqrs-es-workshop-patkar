@@ -7,7 +7,7 @@ namespace Building\Domain\Command;
 use Prooph\Common\Messaging\Command;
 use Rhumsaa\Uuid\Uuid;
 
-class CheckInUser extends Command
+class CheckUserIntoBuilding extends Command
 {
     /**
      * @var Uuid
@@ -27,7 +27,7 @@ class CheckInUser extends Command
         $this->username = $username;
     }
 
-    public static function fromBuildingIdAndUsername(Uuid $buildingId, string $username) : self
+    public static function fromBuildingAndUsername(Uuid $buildingId, string $username) : self
     {
         return new self($buildingId, $username);
     }

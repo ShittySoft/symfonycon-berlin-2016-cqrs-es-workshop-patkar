@@ -70,7 +70,7 @@ call_user_func(function () {
         $buildingId = Uuid::fromString($request->getAttribute('buildingId'));
 
         $commandBus = $sm->get(CommandBus::class);
-        $commandBus->dispatch(Command\CheckInUser::fromBuildingIdAndUsername(
+        $commandBus->dispatch(Command\CheckUserIntoBuilding::fromBuildingAndUsername(
             $buildingId,
             $request->getParsedBody()['username']
         ));
