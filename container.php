@@ -12,9 +12,12 @@ use Bernard\QueueFactory\PersistentFactory;
 use Building\Domain\Aggregate\Building;
 use Building\Domain\Command;
 use Building\Domain\DomainEvent\NewBuildingWasRegistered;
+use Building\Domain\DomainEvent\UserAlreadyCheckedIntoBuilding;
 use Building\Domain\DomainEvent\UserCheckedIntoBuilding;
 use Building\Domain\DomainEvent\UserCheckedOutFromBuilding;
+use Building\Domain\Exception\UserAlreadyCheckedIn;
 use Building\Domain\Repository\BuildingRepositoryInterface;
+use Building\Infrastructure\Listener\RaiseAlreadyCheckedInSecurityBreach;
 use Building\Infrastructure\Projector\AddBuilding;
 use Building\Infrastructure\Projector\AddUserToCheckedInUsers;
 use Building\Infrastructure\Projector\PopulateCheckedInUsers;
@@ -231,6 +234,16 @@ return new ServiceManager([
             );
         },
 
+        Command\SendAlreadyCheckedInSecurityAlert::class => function (ContainerInterface $container) : callable {
+            return function (Command\SendAlreadyCheckedInSecurityAlert $command) {
+                error_log(sprintf(
+                    'SECURITY BREACH: User "%s" checked in again into building "%s"',
+                    $command->username(),
+                    $command->buildingId()
+                ));
+            };
+        },
+
         NewBuildingWasRegistered::class.'-projectors' => function (ContainerInterface $container) : array {
             return [
                 new AddBuilding($container->get(EventStore::class)),
@@ -250,6 +263,12 @@ return new ServiceManager([
                 new RemoveUserFromCheckedInUsers($container->get(EventStore::class)),
                 new PopulateCheckedInUsers($container->get(EventStore::class)),
                 new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
+            ];
+        },
+
+        UserAlreadyCheckedIntoBuilding::class.'-listeners' => function (ContainerInterface $container) : array {
+            return [
+                new RaiseAlreadyCheckedInSecurityBreach($container->get(CommandBus::class))
             ];
         },
     ],
