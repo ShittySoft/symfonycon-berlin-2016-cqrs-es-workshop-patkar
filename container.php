@@ -206,6 +206,13 @@ return new ServiceManager([
                 $buildings->get($command->buildingId())->checkInUser($command->username());
             };
         },
+        Command\CheckUserOutFromBuilding::class => function (ContainerInterface $container) : callable {
+            $buildings = $container->get(BuildingRepositoryInterface::class);
+
+            return function (Command\CheckUserOutFromBuilding $command) use ($buildings) {
+                $buildings->get($command->buildingId())->checkOutUser($command->username());
+            };
+        },
         BuildingRepositoryInterface::class => function (ContainerInterface $container) : BuildingRepositoryInterface {
             return new BuildingRepository(
                 new AggregateRepository(

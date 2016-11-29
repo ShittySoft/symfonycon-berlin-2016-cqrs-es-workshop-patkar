@@ -6,7 +6,9 @@ namespace Building\Domain\Aggregate;
 
 use Building\Domain\DomainEvent\NewBuildingWasRegistered;
 use Building\Domain\DomainEvent\UserCheckedIntoBuilding;
+use Building\Domain\DomainEvent\UserCheckedOutFromBuilding;
 use Building\Domain\Exception\UserAlreadyCheckedIn;
+use Building\Domain\Exception\UserNotCheckedIn;
 use Prooph\EventSourcing\AggregateRoot;
 use Rhumsaa\Uuid\Uuid;
 
@@ -55,7 +57,14 @@ final class Building extends AggregateRoot
 
     public function checkOutUser(string $username)
     {
-        // @TODO to be implemented
+        if (!array_key_exists($username, $this->checkedInUsers)) {
+            throw new UserNotCheckedIn($this->uuid, $this->name, $username);
+        }
+
+        $this->recordThat(UserCheckedOutFromBuilding::fromBuildingAndUsername(
+            $this->uuid,
+            $username
+        ));
     }
 
     protected function whenNewBuildingWasRegistered(NewBuildingWasRegistered $event)
@@ -67,6 +76,11 @@ final class Building extends AggregateRoot
     protected function whenUserCheckedIntoBuilding(UserCheckedIntoBuilding $event)
     {
         $this->checkedInUsers[$event->username()] = null;
+    }
+
+    protected function whenUserCheckedOutFromBuilding(UserCheckedOutFromBuilding $event)
+    {
+        unset($this->checkedInUsers[$event->username()]);
     }
 
     /**
