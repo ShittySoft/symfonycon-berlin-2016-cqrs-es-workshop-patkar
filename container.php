@@ -199,6 +199,14 @@ return new ServiceManager([
                 $buildings->add(Building::new($command->name()));
             };
         },
+        Command\CheckInUser::class => function (ContainerInterface $container) : callable {
+            $buildings = $container->get(BuildingRepositoryInterface::class);
+
+            return function (Command\CheckInUser $command) use ($buildings) {
+                $building = $buildings->get($command->buildingId());
+                $building->checkInUser($command->username());
+            };
+        },
         BuildingRepositoryInterface::class => function (ContainerInterface $container) : BuildingRepositoryInterface {
             return new BuildingRepository(
                 new AggregateRepository(
