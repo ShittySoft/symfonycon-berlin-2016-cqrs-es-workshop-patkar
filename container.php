@@ -15,8 +15,11 @@ use Building\Domain\DomainEvent\NewBuildingWasRegistered;
 use Building\Domain\DomainEvent\UserCheckedIntoBuilding;
 use Building\Domain\DomainEvent\UserCheckedOutFromBuilding;
 use Building\Domain\Repository\BuildingRepositoryInterface;
+use Building\Infrastructure\Projector\AddBuilding;
+use Building\Infrastructure\Projector\AddUserToCheckedInUsers;
 use Building\Infrastructure\Projector\PopulateCheckedInUsers;
 use Building\Infrastructure\Projector\PopulateCheckedInUsersViaSQL;
+use Building\Infrastructure\Projector\RemoveUserFromCheckedInUsers;
 use Building\Infrastructure\Repository\BuildingRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOSqlite\Driver;
@@ -230,18 +233,21 @@ return new ServiceManager([
 
         NewBuildingWasRegistered::class.'-projectors' => function (ContainerInterface $container) : array {
             return [
+                new AddBuilding($container->get(EventStore::class)),
                 new PopulateCheckedInUsers($container->get(EventStore::class)),
                 new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
             ];
         },
         UserCheckedIntoBuilding::class.'-projectors' => function (ContainerInterface $container) : array {
             return [
+                new AddUserToCheckedInUsers($container->get(EventStore::class)),
                 new PopulateCheckedInUsers($container->get(EventStore::class)),
                 new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
             ];
         },
         UserCheckedOutFromBuilding::class.'-projectors' => function (ContainerInterface $container) : array {
             return [
+                new RemoveUserFromCheckedInUsers($container->get(EventStore::class)),
                 new PopulateCheckedInUsers($container->get(EventStore::class)),
                 new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
             ];
