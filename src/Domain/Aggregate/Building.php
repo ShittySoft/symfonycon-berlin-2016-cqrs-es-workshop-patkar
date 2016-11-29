@@ -23,7 +23,7 @@ final class Building extends AggregateRoot
     private $name;
 
     /**
-     * @var string[]
+     * @var <string, null>
      */
     private $checkedInUsers = [];
 
@@ -43,7 +43,7 @@ final class Building extends AggregateRoot
 
     public function checkInUser(string $username)
     {
-        if (in_array($username, $this->checkedInUsers, true)) {
+        if (array_key_exists($username, $this->checkedInUsers)) {
             throw new UserAlreadyCheckedIn($this->uuid, $this->name, $username);
         }
 
@@ -66,7 +66,7 @@ final class Building extends AggregateRoot
 
     protected function whenUserCheckedIntoBuilding(UserCheckedIntoBuilding $event)
     {
-        $this->checkedInUsers[] = $event->username();
+        $this->checkedInUsers[$event->username()] = null;
     }
 
     /**
