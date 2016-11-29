@@ -244,27 +244,27 @@ return new ServiceManager([
             };
         },
 
-        NewBuildingWasRegistered::class.'-projectors' => function (ContainerInterface $container) : array {
-            return [
-                new AddBuilding($container->get(EventStore::class)),
-                new PopulateCheckedInUsers($container->get(EventStore::class)),
-                new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
-            ];
-        },
-        UserCheckedIntoBuilding::class.'-projectors' => function (ContainerInterface $container) : array {
-            return [
-                new AddUserToCheckedInUsers($container->get(EventStore::class)),
-                new PopulateCheckedInUsers($container->get(EventStore::class)),
-                new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
-            ];
-        },
-        UserCheckedOutFromBuilding::class.'-projectors' => function (ContainerInterface $container) : array {
-            return [
-                new RemoveUserFromCheckedInUsers($container->get(EventStore::class)),
-                new PopulateCheckedInUsers($container->get(EventStore::class)),
-                new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
-            ];
-        },
+//        NewBuildingWasRegistered::class.'-projectors' => function (ContainerInterface $container) : array {
+//            return [
+//                new AddBuilding($container->get(EventStore::class)),
+//                new PopulateCheckedInUsers($container->get(EventStore::class)),
+//                new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
+//            ];
+//        },
+//        UserCheckedIntoBuilding::class.'-projectors' => function (ContainerInterface $container) : array {
+//            return [
+//                new AddUserToCheckedInUsers($container->get(EventStore::class)),
+//                new PopulateCheckedInUsers($container->get(EventStore::class)),
+//                new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
+//            ];
+//        },
+//        UserCheckedOutFromBuilding::class.'-projectors' => function (ContainerInterface $container) : array {
+//            return [
+//                new RemoveUserFromCheckedInUsers($container->get(EventStore::class)),
+//                new PopulateCheckedInUsers($container->get(EventStore::class)),
+//                new PopulateCheckedInUsersViaSQL($container->get(Connection::class)),
+//            ];
+//        },
 
         UserAlreadyCheckedIntoBuilding::class.'-listeners' => function (ContainerInterface $container) : array {
             return [
